@@ -31,7 +31,7 @@ The source code provided in `SAES-XTS.py` is programmed natively in Python 3, ad
 
 - **Fundamental Arithmetic:** The state manipulates 16-bit integers natively rather than strings or array matrices. Essential bitwise operations (masks `&`, shifts `<<`, and XORs `^`) pull out the active 4-bit "nibbles" representing the state matrix dynamically.
 - **GF(2^4) Calculations:** A dedicated `gf_mult(a, b)` modulo arithmetic operation functions as the backbone of the MixColumns computation.
-- **XTS Mode Logic:** Our wrapper method chunks pure string payloads into contiguous arrays of 16-bit integers (`blocks`). The algorithm defines a Tweak derived from $K2$, then recursively modifies it per block iteration by multiplying `alpha` in GF(2^16) mapping to the irreducible polynomial $x^{16} + x^5 + x^3 + x^2 + 1$ (`0x002D`).
+- **XTS Mode Logic:** The wrapper method chunks pure string payloads into contiguous arrays of 16-bit integers (`blocks`). The algorithm defines a Tweak derived from $K2$, then recursively modifies it per block iteration by multiplying `alpha` in GF(2^16) mapping to the irreducible polynomial $x^{16} + x^5 + x^3 + x^2 + 1$ (`0x002D`).
 
 ---
 
@@ -39,7 +39,7 @@ The source code provided in `SAES-XTS.py` is programmed natively in Python 3, ad
 Utilizing vulnerabilities established during Step 1, a brute-force module is implemented at the final execution block of the script as a high-speed Known-Plaintext Attack validation.
 
 1. **Context Extraction:** Given the known plaintext string "Secret Data!", the matched XTS ciphertext is fed into the process. 
-2. **Sequential Iteration:** The system loops potential $K1$ keys sequentially from `0x0000` to `0xFFFF`. (In our practical demonstration, $K2$ is held constant as a test vector; otherwise, a nested $2^{32}$ loop is mandated).
+2. **Sequential Iteration:** The system loops potential $K1$ keys sequentially from `0x0000` to `0xFFFF`. (In the practical demonstration, $K2$ is held constant as a test vector; otherwise, a nested $2^{32}$ loop is mandated).
 3. **Execution Optimization (Pruning):** Instead of fully deciphering the multi-block string per loop, the function selectively strips the *first 16-bit ciphertext block* only. Decrypting block '0' alone instantly eliminates >99% of false keys, expediting computation remarkably.
 4. **Result Validation:** Only upon a successful validation against block '0' does the script evaluate subsequent text blocks. If exactly verified, the loop halts. Output captures the exact keys and execution profiling metrics. Generally, the brute force attack concludes in under a tenth of a second, effectively compromising the scaled cipher.
 
